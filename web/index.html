@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="عِرضْ (3erdh) — تتبع وتصحيح تلاوة القرآن الكريم بالذكاء الاصطناعي على جهازك بدون إنترنت وبخصوصية تامة.">
+  <meta name="theme-color" content="#070B14">
+
+  <!-- iOS Safari meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="عِرضْ">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon-precomposed" href="icons/apple-touch-icon-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="icons/Icon-192.png">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="3erdh (عِرضْ) - تتبع تلاوة القرآن الكريم">
+  <meta property="og:description" content="تتبع وتصحيح تلاوة القرآن الكريم بالذكاء الاصطناعي على جهازك بدون إنترنت.">
+  <meta property="og:image" content="icons/Icon-512.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon.png"/>
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/Icon-192.png"/>
+
+  <title>3erdh (عِرضْ) | تتبع تلاوة القرآن الكريم</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background-color: #070B14;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", sans-serif;
+      overflow: hidden;
+    }
+
+    /* Model Download Glassmorphism Modal */
+    #model-download-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 11, 20, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 999999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s ease;
+    }
+    .model-card {
+      background: #0F172A;
+      padding: 2.25rem 2rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(245, 183, 56, 0.25);
+      max-width: 25rem;
+      width: 90%;
+      text-align: center;
+      border: 1px solid rgba(245, 183, 56, 0.2);
+    }
+    .model-icon-badge {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 1.25rem auto;
+      background: linear-gradient(135deg, #F5B738, #D97706);
+      border-radius: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 16px -4px rgba(245, 183, 56, 0.35);
+      color: #070B14;
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+    .modal-title-ar {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #F8FAFC;
+      margin-bottom: 0.2rem;
+      direction: rtl;
+    }
+    .modal-title-en {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #94A3B8;
+      margin-bottom: 0.9rem;
+    }
+    .modal-desc-ar {
+      font-size: 0.9rem;
+      color: #E2E8F0;
+      margin-bottom: 0.4rem;
+      line-height: 1.6;
+      direction: rtl;
+    }
+    .modal-desc-en {
+      font-size: 0.8rem;
+      color: #94A3B8;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .modal-divider {
+      height: 1px;
+      background: rgba(148, 163, 184, 0.15);
+      margin: 0.6rem auto;
+      width: 60%;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .btn-primary {
+      flex: 1;
+      background: #F5B738;
+      color: #070B14;
+      border: none;
+      padding: 0.875rem 1.25rem;
+      border-radius: 9999px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(245, 183, 56, 0.3);
+    }
+    .btn-primary:hover {
+      background: #E5A625;
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: #1E293B;
+      color: #94A3B8;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      padding: 0.875rem 1.25rem;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+      background: #334155;
+      color: #F8FAFC;
+    }
+
+    /* Progress Bar */
+    .progress-bar-bg {
+      width: 100%;
+      height: 0.75rem;
+      background: #1E293B;
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+      border: 1px solid rgba(245, 183, 56, 0.2);
+    }
+    #model-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #F5B738, #10B981);
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+    #model-progress-text {
+      font-size: 0.85rem;
+      color: #F5B738;
+      font-weight: 700;
+    }
+
+    /* PWA Install Banners */
+    .pwa-banner {
+      position: fixed;
+      bottom: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 2rem);
+      max-width: 28rem;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(245, 183, 56, 0.3);
+      border-radius: 1.25rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      padding: 0.875rem 1.15rem;
+      z-index: 2147483647;
+      pointer-events: auto;
+      animation: pwaSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes pwaSlideUp {
+      from { transform: translate(-50%, 100%); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+    .pwa-banner-content {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .pwa-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 0.65rem;
+      flex-shrink: 0;
+    }
+    .pwa-text {
+      flex: 1;
+      text-align: right;
+      direction: rtl;
+    }
+    .pwa-title-ar {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #F8FAFC;
+      margin-bottom: 0.1rem;
+    }
+    .pwa-subtitle {
+      font-size: 0.75rem;
+      color: #94A3B8;
+      line-height: 1.3;
+    }
+    .pwa-subtitle-en {
+      font-size: 0.675rem;
+      color: #64748B;
+      direction: ltr;
+      text-align: left;
+      margin-top: 0.1rem;
+    }
+    .pwa-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-shrink: 0;
+    }
+    .pwa-btn {
+      background: #F5B738;
+      color: #070B14;
+      border: none;
+      padding: 0.5rem 0.875rem;
+      border-radius: 9999px;
+      font-weight: 800;
+      font-size: 0.8rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .pwa-btn:hover { background: #E5A625; }
+    .pwa-close-btn {
+      background: transparent;
+      border: none;
+      color: #64748B;
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 0.25rem;
+      line-height: 1;
+    }
+    .pwa-close-btn:hover { color: #F8FAFC; }
+  </style>
+</head>
+<body>
+
+  <!-- On-Demand Model Download & Acceptance Modal (Shown ONLY on first Record press) -->
+  <div id="model-download-modal">
+    <div class="model-card">
+      <div class="model-icon-badge">عِرضْ</div>
+      
+      <!-- Acceptance Section -->
+      <div id="model-prompt-section">
+        <h2 id="model-modal-title-ar" class="modal-title-ar">الموافقة مطلوبة</h2>
+        <div id="model-modal-title-en" class="modal-title-en">Acceptance Required</div>
+        <p id="model-modal-desc-ar" class="modal-desc-ar">يستهلك تطبيق الويب حوالي 70 ميجابايت من باقة الإنترنت لأول مرة فقط لتشغيل الذكاء الاصطناعي محلياً وبدون إنترنت بعد ذلك.</p>
+        <div class="modal-divider"></div>
+        <p id="model-modal-desc-en" class="modal-desc-en">Downloads ~70MB AI model for the first time only to run speech recognition 100% offline on your device.</p>
+        <div class="modal-actions">
+          <button id="model-accept-btn" class="btn-primary">تحميل • Download</button>
+          <button id="model-cancel-btn" class="btn-secondary">إلغاء • Cancel</button>
+        </div>
+      </div>
+
+      <!-- Download Progress Section -->
+      <div id="model-progress-section" style="display: none;">
+        <h2 id="model-progress-title-ar" class="modal-title-ar">جارٍ التحميل...</h2>
+        <div id="model-progress-title-en" class="modal-title-en">Downloading Model...</div>
+        <p id="model-progress-desc-ar" class="modal-desc-ar" style="margin-bottom: 0.25rem;">يرجى الانتظار بينما يتم تجهيز الذكاء الاصطناعي.</p>
+        <p id="model-progress-desc-en" class="modal-desc-en" style="margin-bottom: 1rem;">Please wait while the model downloads.</p>
+        <div class="progress-bar-bg">
+          <div id="model-progress-fill"></div>
+        </div>
+        <div id="model-progress-text">0%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PWA Install Banner (Android / Chrome / Windows / Desktop) -->
+  <div id="pwa-install-banner" class="pwa-banner" style="display: none;">
+    <div class="pwa-banner-content">
+      <img src="icons/Icon-192.png" alt="3erdh Icon" class="pwa-icon" onerror="this.onerror=null; this.src='icons/Icon-192.png';" />
+      <div class="pwa-text">
+        <div class="pwa-title-ar">أضف تطبيق عِرضْ للشاشة الرئيسية</div>
+        <div class="pwa-subtitle">لتجربة شاشة كاملة واستخدام فوري بدون إنترنت</div>
+        <div class="pwa-subtitle-en">Add to Home Screen for fast offline access</div>
+      </div>
+      <div class="pwa-actions">
+        <button id="pwa-install-btn" class="pwa-btn">إضافة • Add</button>
+        <button id="pwa-close-btn" class="pwa-close-btn" aria-label="Close">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PWA iOS Safari Install Banner -->
+  <div id="pwa-ios-banner" class="pwa-banner" style="display: none;">
+    <div class="pwa-banner-content">
+      <img src="icons/Icon-192.png" alt="3erdh Icon" class="pwa-icon" onerror="this.onerror=null; this.src='icons/Icon-192.png';" />
+      <div class="pwa-text">
+        <div class="pwa-title-ar">أضف تطبيق عِرضْ للشاشة الرئيسية</div>
+        <div class="pwa-subtitle">
+          اضغط على زر المشاركة 
+          <svg viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 1.15em; height: 1.15em; vertical-align: -0.22em; display: inline-block;">
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+            <polyline points="16 6 12 2 8 6"></polyline>
+            <line x1="12" y1="2" x2="12" y2="15"></line>
+          </svg>
+          ثم اختر <strong>"إضافة إلى الصفحة الرئيسية"</strong>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#F8FAFC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 1.05em; height: 1.05em; vertical-align: -0.18em; display: inline-block;">
+            <rect x="3" y="3" width="18" height="18" rx="4" ry="4"></rect>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+        </div>
+        <div class="pwa-subtitle-en">
+          Tap Share 
+          <svg viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 1.05em; height: 1.05em; vertical-align: -0.2em; display: inline-block;">
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+            <polyline points="16 6 12 2 8 6"></polyline>
+            <line x1="12" y1="2" x2="12" y2="15"></line>
+          </svg>
+          below, then select <strong>"Add to Home Screen"</strong>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#F8FAFC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 0.95em; height: 0.95em; vertical-align: -0.15em; display: inline-block;">
+            <rect x="3" y="3" width="18" height="18" rx="4" ry="4"></rect>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+        </div>
+      </div>
+      <div class="pwa-actions">
+        <button id="pwa-ios-close-btn" class="pwa-close-btn" aria-label="Close">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="scripts/pwa_install.js?v=10"></script>
+  <script src="scripts/sherpa-onnx-asr.js?v=10"></script>
+  <script src="scripts/sherpa_official_app.js?v=10"></script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

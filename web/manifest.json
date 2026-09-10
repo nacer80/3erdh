@@ -1,0 +1,40 @@
+{
+    "id": "3erdh-quran-app",
+    "name": "3erdh (عِرضْ) - تتبع تلاوة القرآن الكريم",
+    "short_name": "عِرضْ",
+    "start_url": "./?source=pwa",
+    "scope": "./",
+    "display": "standalone",
+    "display_override": ["standalone", "window-controls-overlay"],
+    "background_color": "#070B14",
+    "theme_color": "#070B14",
+    "description": "تطبيق عِرضْ لتتبع وتصحيح تلاوة القرآن الكريم بالذكاء الاصطناعي على جهازك بدون إنترنت وبخصوصية تامة.",
+    "orientation": "any",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

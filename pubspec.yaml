@@ -1,0 +1,36 @@
+name: erdh
+description: "3erdh (عِرضْ) — Modern Real-time Tracker for القرآن العظيم"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  quran: ^1.4.1
+  recite_quran: ^1.0.2
+
+  record: ^7.1.1
+  shared_preferences: ^2.2.0
+  sherpa_onnx: 1.13.5
+  super_sliver_list: ^0.4.1
+  wakelock_plus: ^1.6.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/icon/app_icon.png
+    - assets/mushaf_layout.json
+
+  fonts:
+    - family: HafsSmart
+      fonts:
+        - asset: assets/fonts/HafsSmart_08.ttf

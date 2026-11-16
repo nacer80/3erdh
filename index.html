@@ -363,6 +363,13 @@ body:fullscreen .main,body:-webkit-full-screen .main{height:100dvh;min-height:0;
   #mp3TesterWords.words.flow.line-mode{height:6.5em!important;}
   #mp3TesterWords .mp3-tester-word{font-size:19px!important;line-height:2.1!important;}
 }
+.qlab-progress{margin:8px 14px 0;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:rgba(120,144,156,.07);font-size:12px;color:var(--muted)}
+.qlab-progress .qp-head{display:flex;justify-content:space-between;gap:8px;margin-bottom:6px;font-weight:600;color:var(--text)}
+.qlab-progress .qp-track{height:6px;border-radius:3px;background:rgba(120,144,156,.18);overflow:hidden}
+.qlab-progress .qp-fill{height:100%;width:0%;border-radius:3px;background:linear-gradient(90deg,#d4a53c,#f0c96a);transition:width .25s ease}
+.qlab-progress.qp-indet .qp-fill{width:35%!important;animation:qpSlide 1.2s ease-in-out infinite}
+@keyframes qpSlide{0%{margin-left:-35%}100%{margin-left:100%}}
+.qlab-progress small{display:block;margin-top:6px}
 </style>
 </head>
 <body>
@@ -424,7 +431,7 @@ body:fullscreen .main,body:-webkit-full-screen .main{height:100dvh;min-height:0;
   <div class="content">
     <section class="page active" id="page-tasmee">
       <div class="hero"><div class="hero-row"><div><div class="eyebrow">اختبار الحفظ · مطابقة متسلسلة</div><h3>اتلُ، وسنكشف الكلمات تباعًا</h3><p>تُخفى الكلمات القادمة لتستدعيها من حفظك. يعالج Zipformer الفونيمي عبر Sherpa صوتك محليًا، ثم تُطابق النتيجة بالتتابع دون إرسال التسجيل إلى الإنترنت.</p></div><button class="surah-pick" data-open-surahs><div><small>السورة الحالية</small><strong id="heroSurah">الفاتحة</strong></div><svg width="18" height="18"><use href="#i-chevron"/></svg></button></div></div>
-      <div class="ai-strip"><span>محرك الذكاء المحلي</span><span class="ai-badge" id="runtimeStatus"><span>ONNX Runtime</span><b>تهيئة…</b></span><span class="ai-badge" id="smartStatus"><span>Sherpa Smart</span><b>بانتظار النماذج</b></span><span class="ai-badge" id="asrStatus"><span>ASR</span><b>اختر المجلد</b></span><span class="ai-badge" id="vadStatus"><span>VAD</span><b>اختر المجلد</b></span><button class="btn ghost folder-btn loading" id="chooseModelsBtn" type="button">⚠ اختر مجلد data</button><button class="help-icon" id="modelHelpBtn" type="button" title="مسار وأسماء النماذج">؟</button><input id="modelFolderInput" type="file" webkitdirectory directory multiple hidden><span class="model-insight" id="deviceBadge">الميكروفون: النظام الافتراضي</span></div>
+      <div class="ai-strip"><span>محرك الذكاء المحلي</span><span class="ai-badge" id="runtimeStatus"><span>ONNX Runtime</span><b>تهيئة…</b></span><span class="ai-badge" id="smartStatus"><span>Sherpa Smart</span><b>بانتظار النماذج</b></span><span class="ai-badge" id="asrStatus"><span>ASR</span><b>اختر المجلد</b></span><span class="ai-badge" id="vadStatus"><span>VAD</span><b>اختر المجلد</b></span><button class="btn ghost folder-btn" id="autoRetryBtn" type="button" hidden>⚠ إعادة المحاولة</button><button class="help-icon" id="modelHelpBtn" type="button" title="مسار وأسماء النماذج">؟</button><span class="model-insight" id="deviceBadge">الميكروفون: النظام الافتراضي</span></div>
       <div class="metrics-inline" aria-label="ملخص الجلسة">
         <span>كلمات صحيحة: <b id="correctStat">٠</b></span><i>•</i>
         <span>دقّة الجلسة: <b id="accuracyStat">١٠٠٪</b></span><i>•</i>
@@ -434,6 +441,8 @@ body:fullscreen .main,body:-webkit-full-screen .main{height:100dvh;min-height:0;
         <span>التقدّم: <b id="positionStat">٠ / ٢٩</b></span>
       </div>
       <div class="status" id="statusBox"><span class="status-dot"></span><span class="status-text" id="statusText">اختر السورة، ثم اضغط «ابدأ التسميع» واتلُ بوضوح.</span><span class="heard hidden" id="heardText"></span><span class="score-pill hidden" id="scorePill"></span><div class="signal-meter" title="مستوى الميكروفون ونتيجة VAD"><div class="signal-track"><div class="signal-fill" id="signalFill"></div></div><span class="signal-value" id="signalValue">— dBFS</span></div></div>
+      <div id="qlabNotice" style="display:none;margin:8px 14px 0;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:rgba(120,144,156,.07);color:var(--muted);font-size:12px;line-height:1.7;direction:ltr;text-align:left"></div>
+      <div id="qlabProgress" class="qlab-progress hidden" aria-live="polite"><div class="qp-head"><span id="qpLabel">تحميل نموذج Quran Lab — TajweedFormer V4</span><span id="qpPct">…</span></div><div class="qp-track"><div class="qp-fill" id="qpFill"></div></div><small id="qpSub">أول استخدام فقط — يُخزَّن محليًا بعد اكتماله</small></div>
       <div class="card mushaf">
         <div class="surah-frame" id="tasmeeTitle">سورة الفاتحة</div>
         <div class="basmala hidden" id="tasmeeBasmala">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
@@ -477,8 +486,8 @@ body:fullscreen .main,body:-webkit-full-screen .main{height:100dvh;min-height:0;
 <nav class="mobile-nav" aria-label="التنقل للهاتف"><button class="nav-btn active" data-page="tasmee"><svg><use href="#i-mic"/></svg><span>التسميع</span></button><button class="nav-btn" data-page="learn"><svg><use href="#i-learn"/></svg><span>التعلّم</span></button><button class="nav-btn" data-page="reader"><svg><use href="#i-book"/></svg><span>حفص</span></button><button class="nav-btn" data-page="progress"><svg><use href="#i-chart"/></svg><span>تقدّمي</span></button></nav>
 
 <div class="modal-backdrop hidden" id="surahModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="surahModalTitle"><div class="modal-head"><h3 id="surahModalTitle">اختر سورة</h3><button class="icon-btn" data-close-modal><svg width="18" height="18"><use href="#i-close"/></svg></button></div><div class="modal-body"><div class="voice-search-row"><input class="search modal-search" id="surahSearch" placeholder="ابحث باسم السورة أو انطق اسمها…"><button class="btn gold compact" id="voiceSurahSearchBtn">🎙 البحث الصوتي</button></div><div class="voice-result hidden" id="surahVoiceResult"></div><div class="modal-surahs" id="modalSurahList"></div></div></div></div>
-<div class="modal-backdrop hidden" id="modelHelpModal"><div class="modal" role="dialog" aria-modal="true"><div class="modal-head"><h3>مساعدة ملفات النماذج</h3><button class="icon-btn" data-close-model-help><svg width="18" height="18"><use href="#i-close"/></svg></button></div><div class="modal-body"><div class="help-section"><small>المسار المستخدم</small><code id="modelHelpPath">/data/</code></div><div class="help-section"><small>النموذج الصوتي النشط</small><code id="modelHelpActive">—</code></div><div class="help-section"><small>الملفات المطلوبة (Zipformer / Sherpa فقط)</small><ul class="model-file-list" id="modelHelpFiles"><li>data/qpc_hafs.json</li><li>data/surah_info.json</li><li>data/ordered_quran_phonemes.json</li><li>data/sherpa/sherpa-onnx-wasm-main-asr.js</li><li>data/sherpa/sherpa-onnx-wasm-main-asr.wasm</li><li>data/onnx/zipformer_p_arabic_v3.1.int8.onnx</li><li>data/onnx/quran_asr_tokens.json</li></ul></div><p class="helper">يُحاول التطبيق فتح مجلد data بجانب ملف الصفحة تلقائيًا. إن تعذّر ذلك اختر المجلد يدويًا. لا حاجة لملفات FastConformer أو Silero.</p></div></div></div>
-<div class="modal-backdrop hidden" id="settingsModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle"><div class="modal-head"><h3 id="settingsTitle">إعدادات التسميع</h3><button class="icon-btn" data-close-modal><svg width="18" height="18"><use href="#i-close"/></svg></button></div><div class="modal-body"><div class="setting"><div class="setting-top"><b>محرك التعرف</b><span>Zipformer + Sherpa فقط</span></div><small>التعرف يعتمد حصريًا على Zipformer الفونيمي عبر Sherpa محليًا، مع DTW وتوقيت الفونيمات. لا يوجد انتقال إلى FastConformer.</small><select class="select-input hidden" id="recognitionEngineSelect" disabled><option value="smart">ذكي — Zipformer + Sherpa (موصى به)</option><option value="fast">متوافق — FastConformer</option></select></div><label class="setting setting-top hidden"><span><b>الانتقال التلقائي السلس بين المحركات</b><small>Zipformer الذكي ← FastConformer Mixed ← FastConformer Q8، مع إبقاء الميكروفون والجلسة دون إعادة ضبط.</small></span><input class="switch" id="autoEngineFallbackSwitch" type="checkbox" checked></label><label class="setting setting-top"><span><b>تجاهل الحرف المفرد</b><small>تجاهل أي خرج صوتي يتكون من حرف عربي أو فونيم واحد فقط دون تسجيله خطأ.</small></span><input class="switch" id="ignoreSingleLetterSwitch" type="checkbox"></label>
+<div class="modal-backdrop hidden" id="modelHelpModal"><div class="modal" role="dialog" aria-modal="true"><div class="modal-head"><h3>مساعدة ملفات النماذج</h3><button class="icon-btn" data-close-model-help><svg width="18" height="18"><use href="#i-close"/></svg></button></div><div class="modal-body"><div class="help-section"><small>المسار المستخدم</small><code id="modelHelpPath">/data/</code></div><div class="help-section"><small>النموذج الصوتي النشط</small><code id="modelHelpActive">—</code></div><div class="help-section"><small>الإصدار</small><code>عرض v2.2.5</code></div><div class="help-section"><small>ملفات المحركات المحلية (اختيارية — غير مطلوبة مع Quran Lab)</small><ul class="model-file-list" id="modelHelpFiles"><li>data/qpc_hafs.json</li><li>data/surah_info.json</li><li>data/ordered_quran_phonemes.json</li><li>data/sherpa/sherpa-onnx-wasm-main-asr.js</li><li>data/sherpa/sherpa-onnx-wasm-main-asr.wasm</li><li>data/onnx/zipformer_p_arabic_v3.1.int8.onnx</li><li>data/onnx/quran_asr_tokens.json</li></ul></div><p class="helper">يُحمَّل مجلد data تلقائيًا من الإنترنت (أو يُفتح بجانب ملف الصفحة عند التشغيل المحلي). محرك Quran Lab لا يحتاج أي ملفات — يعمل فورًا عند وجود quranlab-key.js في الموقع، ويستخرج توقيت الكلمات (TajweedFormer V4) لتقرير التجويد الزمني.</p></div></div></div>
+<div class="modal-backdrop hidden" id="settingsModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle"><div class="modal-head"><h3 id="settingsTitle">إعدادات التسميع</h3><button class="icon-btn" data-close-modal><svg width="18" height="18"><use href="#i-close"/></svg></button></div><div class="modal-body"><div class="setting"><div class="setting-top"><b>محرك التعرف</b><span>Quran Lab (اونلاين)</span></div><small>Quran Lab — TajweedFormer (اونلاين): يعمل دون أي ملفات، ويستخرج توقيت الكلمات من خرج النموذج لتقرير التجويد الزمني. إن تعذّر اتصاله تعمل النسخ المحلية (Zipformer/Sherpa) احتياطيًا.</small><select class="select-input" id="recognitionEngineSelect"><option value="quran">Quran Lab — TajweedFormer (اونلاين)</option></select></div><label class="setting setting-top hidden"><span><b>الانتقال التلقائي السلس بين المحركات</b><small>Zipformer الذكي ← FastConformer Mixed ← FastConformer Q8، مع إبقاء الميكروفون والجلسة دون إعادة ضبط.</small></span><input class="switch" id="autoEngineFallbackSwitch" type="checkbox" checked></label><label class="setting setting-top"><span><b>تجاهل الحرف المفرد</b><small>تجاهل أي خرج صوتي يتكون من حرف عربي أو فونيم واحد فقط دون تسجيله خطأ.</small></span><input class="switch" id="ignoreSingleLetterSwitch" type="checkbox"></label>
 <label class="setting setting-top"><span><b>كشف الحرف المنفرد</b><small>عند نطق حرف واحد فقط (مثل «ب» أو «م»)، يُعتبر تطابقًا إذا كان الحرف المتوقع يبدأ بنفس الحرف. مفيد لسور مثل «الم» و«حم».</small></span><input class="switch" id="detectSingleLetterSwitch" type="checkbox" checked></label><div class="setting hidden"><div class="setting-top"><b>نموذج FastConformer</b><span>محلي</span></div><small>الوضع التلقائي يفضّل Mixed لدقة أعلى في الحروف والحركات، ثم ينتقل إلى Q8 إذا تعذّر تحميله. تغيير الخيار يطبّق بعد إعادة تحميل الصفحة.</small><select class="select-input" id="modelSelect"><option value="auto">تلقائي — Mixed ثم Q8</option><option value="q8">fastconformer_ar_ctc_q8.onnx</option><option value="mixed">qurankarim-fastconformer-mixed.onnx</option></select><div class="model-note">/data/onnx/fastconformer_ar_ctc_q8.onnx<br>/data/onnx/qurankarim-fastconformer-mixed.onnx<br>/data/onnx/silero_vad.onnx</div></div><div class="setting hidden"><div class="setting-top"><b>حساسية Silero VAD</b><span id="vadValue">٥٠٪</span></div><small>احتمال الكلام المطلوب قبل إرسال المقطع إلى FastConformer. ارفع القيمة في البيئة الصاخبة.</small><input class="range" id="vadRange" type="range" min="30" max="80" step="5" value="50"></div><div class="setting hidden"><div class="setting-top"><b>طول مقطع التحليل</b><span id="chunkValue">٣٫٦ ث</span></div><small>المقاطع الأقصر أسرع، والأطول تمنح النموذج سياقًا لغويًا أفضل.</small><input class="range" id="chunkRange" type="range" min="25" max="70" step="5" value="36"></div><div class="setting"><div class="setting-top"><b>عتبة المطابقة</b><span id="thresholdValue">٥٥٪</span></div><small>النسبة الدنيا لاعتبار الكلمة المنطوقة مطابقة. اخفضها إذا كان التعرّف على صوتك غير دقيق.</small><input class="range" id="thresholdRange" type="range" min="40" max="90" step="5" value="55"></div><div class="setting"><div class="setting-top"><b>قوة تمويه الكلمات</b><span id="blurValue">٧ بكسل</span></div><small>تحكّم في مقدار إخفاء الكلمات القادمة أثناء اختبار الحفظ.</small><input class="range" id="blurRange" type="range" min="2" max="12" step="1" value="7"></div><label class="setting setting-top"><span><b>الاستكشاف التتابعي الذكي</b><small>يتحمّل سقوط كلمة قصيرة ويتحقق من الكلمات القليلة التالية دون قفز بعيد.</small></span><input class="switch" id="lookaheadSwitch" type="checkbox" checked></label><label class="setting setting-top"><span><b>إعادة التلاوة التلقائية داخل الآية</b><small>إذا بدأت من موضع أقدم داخل الآية، يعيد النظام المقارنة من ذلك الموضع تلقائيًا. عطّلها لمنع تحريك المؤشر إلى الخلف.</small></span><input class="switch" id="autoRewindSwitch" type="checkbox" checked></label><label class="setting setting-top"><span><b>التنبيه الصوتي عند الخطأ</b><small>تشغيل نغمة قصيرة مولّدة محليًا عند عدم التطابق.</small></span><input class="switch" id="soundSwitch" type="checkbox" checked></label><div class="setting"><div class="setting-top"><span><b>مستوى تدقيق التجويد الزمني</b><small>مستوحى من إعدادات recite_quran: السهل 150ms، المتوسط 200ms، الصارم 250ms للحركة الواحدة.</small></span></div><select class="select-input" id="tajweedDifficulty"><option value="easy">سهل — 0.15 ثانية للحركة</option><option value="normal">متوسط — 0.20 ثانية للحركة</option><option value="strict">صارم — 0.25 ثانية للحركة</option></select></div><label class="setting setting-top"><span><b>التحقق من أحكام التجويد الزمنية</b><small>فحص المدود والشدة وغنة النون والميم المشددتين اعتمادًا على توقيتات CTC. الكلمات الصحيحة مع تنبيه تجويد تظهر باللون الأصفر.</small></span><input class="switch" id="tajweedSwitch" type="checkbox" checked></label><label class="setting setting-top"><span><b>التدقيق في الحركات والتشكيل</b><small>تحليل الفتحة والضمة والكسرة والسكون والشدة والتنوين من خرج Zipformer/Sherpa، مع فصل الخطأ الصريح عن الحركة غير الملتقطة.</small></span><input class="switch" id="harakatSwitch" type="checkbox" checked></label><label class="setting setting-top"><span><b>العرض السلس للسور الطويلة</b><small>عرض نص السورة كاملًا في سطور ثابتة تتحرك بسلاسة مع تتبّع تلقائي لموضع التلاوة (نمط quran_mo3aleem). وعند تعطيله: ثلاثة أسطر فقط — المنتصف هو سطر الكلمة الحالية، والسطر المكتمل يخفى ويظهر سطر جديد.</small></span><input class="switch" id="windowSwitch" type="checkbox"></label>
 <label class="setting setting-top"><span><b>عرض المصحف (بدون مربعات)</b><small>عرض الكلمات بأسلوب المصحف: بدون مستطيلات حول الكلمات، مع ظهور أرقام الآيات ﴿١﴾، وتلوين الخط السفلي للأخطاء والتنبيهات بدل الخلفية.</small></span><input class="switch" id="mushafStyleSwitch" type="checkbox"></label><div style="display:flex;gap:8px;margin-top:16px"><button class="btn ghost" id="resetSettingsBtn" style="flex:1">استعادة الإعدادات الافتراضية</button><button class="btn gold" data-close-modal style="flex:1">حفظ وإغلاق</button></div></div></div></div>
 <div class="modal-backdrop hidden" id="completeModal"><div class="modal" role="dialog" aria-modal="true"><div class="modal-body" style="text-align:center;padding:35px"><div class="brand-mark" style="margin:auto;width:60px;height:60px"><svg width="30" height="30"><use href="#i-check"/></svg></div><h2 style="font-family:'Traditional Arabic',serif;color:var(--gold2);font-size:29px;margin-bottom:5px">ما شاء الله، اكتملت السورة!</h2><p id="completeSummary" style="color:var(--muted);font-size:12px"></p><div style="display:flex;justify-content:center;gap:9px;margin-top:20px"><button class="btn ghost" data-close-modal>إغلاق</button><button class="btn outline" id="completeReportBtn">تقرير الأخطاء</button><button class="btn gold" id="completeAgain">إعادة التسميع</button></div></div></div></div>
@@ -3422,6 +3431,7 @@ window.fetchSherpaModel = async function(url) {
 
 
 </script>
+<script src="quranlab-key.js"></script>
 <script type="module">
 const ort=(function(){
 /*!
@@ -3446,9 +3456,9 @@ const pageNames={tasmee:'التسميع الذكي',learn:'مسار التعلّ
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 function setSpeechSupport(_){}
 const svg=(id)=>`<svg width="18" height="18"><use href="#i-${id}"/></svg>`;
-const state={dataReady:false,surahId:1,current:0,correct:new Set(),revealed:new Set(),failed:new Set(),missed:new Set(),wordHistory:[],mistakes:0,mistakeRecords:[],harakatRecords:[],tajweedRecords:[],correctionId:null,harakatCorrectionIndex:null,tajweedCorrectionIndex:null,highlightAyah:null,lastScore:null,listening:false,desiredListening:false,lessonAyah:0,lessonDone:new Set(),page:'tasmee',settings:{threshold:.55,blur:7,lookahead:true,sound:true,window:false,model:'auto',vadThreshold:.50,chunkSeconds:3.6,micDeviceId:'',micDeviceLabel:'النظام الافتراضي',micConfigured:false,splashSeen:false,harakatEnabled:true,tajweedEnabled:true,tajweedDifficulty:'normal',recognitionEngine:'smart',ignoreSingleLetter:false,autoEngineFallback:false,recognitionTuned:false,mushafStyle:true,autoRewind:true},hardWordSet:new Set(),history:[]};
-const DEFAULT_RECITATION_SETTINGS={threshold:.55,blur:7,lookahead:true,sound:true,window:false,model:'auto',vadThreshold:.50,chunkSeconds:4.2,harakatEnabled:true,tajweedEnabled:true,tajweedDifficulty:'normal',recognitionEngine:'smart',ignoreSingleLetter:false,detectSingleLetter:true,autoEngineFallback:false,mushafStyle:true};
-function sanitizeSettings(){const settings=state.settings;settings.threshold=Math.max(.4,Math.min(.9,Number(settings.threshold)||.55));settings.blur=Math.max(2,Math.min(12,Number(settings.blur)||7));settings.vadThreshold=Math.max(.3,Math.min(.8,Number(settings.vadThreshold)||.5));settings.chunkSeconds=Math.max(2.5,Math.min(7,Number(settings.chunkSeconds)||4.2));if(!['auto','mixed','q8'].includes(settings.model))settings.model='auto';settings.recognitionEngine='smart';settings.autoEngineFallback=false;if(!['easy','normal','strict'].includes(settings.tajweedDifficulty))settings.tajweedDifficulty='normal';for(const key of ['lookahead','sound','window','harakatEnabled','tajweedEnabled','ignoreSingleLetter','detectSingleLetter','autoEngineFallback','mushafStyle','autoRewind'])if(typeof settings[key]!=='boolean')settings[key]=DEFAULT_RECITATION_SETTINGS[key];document.documentElement.style.setProperty('--blur',`${settings.blur}px`)}
+const state={dataReady:false,surahId:1,current:0,correct:new Set(),revealed:new Set(),failed:new Set(),missed:new Set(),wordHistory:[],mistakes:0,mistakeRecords:[],harakatRecords:[],tajweedRecords:[],correctionId:null,harakatCorrectionIndex:null,tajweedCorrectionIndex:null,highlightAyah:null,lastScore:null,listening:false,desiredListening:false,lessonAyah:0,lessonDone:new Set(),page:'tasmee',settings:{threshold:.55,blur:7,lookahead:true,sound:true,window:false,model:'auto',vadThreshold:.50,chunkSeconds:3.6,micDeviceId:'',micDeviceLabel:'النظام الافتراضي',micConfigured:false,splashSeen:false,harakatEnabled:true,tajweedEnabled:true,tajweedDifficulty:'normal',recognitionEngine:'quran',ignoreSingleLetter:false,autoEngineFallback:false,recognitionTuned:false,mushafStyle:true,autoRewind:true},hardWordSet:new Set(),history:[]};
+const DEFAULT_RECITATION_SETTINGS={threshold:.55,blur:7,lookahead:true,sound:true,window:false,model:'auto',vadThreshold:.50,chunkSeconds:4.2,harakatEnabled:true,tajweedEnabled:true,tajweedDifficulty:'normal',recognitionEngine:'quran',ignoreSingleLetter:false,detectSingleLetter:true,autoEngineFallback:false,mushafStyle:true};
+function sanitizeSettings(){const settings=state.settings;settings.threshold=Math.max(.4,Math.min(.9,Number(settings.threshold)||.55));settings.blur=Math.max(2,Math.min(12,Number(settings.blur)||7));settings.vadThreshold=Math.max(.3,Math.min(.8,Number(settings.vadThreshold)||.5));settings.chunkSeconds=Math.max(2.5,Math.min(7,Number(settings.chunkSeconds)||4.2));if(!['auto','mixed','q8'].includes(settings.model))settings.model='auto';if(settings.recognitionEngine!=='quran')settings.recognitionEngine='quran';settings.autoEngineFallback=false;if(!['easy','normal','strict'].includes(settings.tajweedDifficulty))settings.tajweedDifficulty='normal';for(const key of ['lookahead','sound','window','harakatEnabled','tajweedEnabled','ignoreSingleLetter','detectSingleLetter','autoEngineFallback','mushafStyle','autoRewind'])if(typeof settings[key]!=='boolean')settings[key]=DEFAULT_RECITATION_SETTINGS[key];document.documentElement.style.setProperty('--blur',`${settings.blur}px`)}
 function resetRecitationSettings(){const mic={micDeviceId:state.settings.micDeviceId,micDeviceLabel:state.settings.micDeviceLabel,micConfigured:state.settings.micConfigured,splashSeen:state.settings.splashSeen,recognitionTuned:true};Object.assign(state.settings,DEFAULT_RECITATION_SETTINGS,mic);ASR.fastFailedModels.clear();sanitizeSettings();saveStored();renderSettings();renderTasmee();setStatus('تمت استعادة إعدادات التسميع الافتراضية مع الاحتفاظ بالميكروفون المختار.')}
 let toastTimer=null,sessionSaved=false;
 
@@ -4562,6 +4572,117 @@ let SELECTED_MODEL_FILES=null;
 let EMBEDDED_RUNTIME_READY=false;
 let EMBEDDED_RUNTIME_URLS=[];
 
+// ============ التحميل التلقائي الكامل من الإنترنت (بدون إضافة يدوية) + ذاكرة محلية ============
+const AUTO_DATA_MODE=(location.protocol!=='file:');
+const AUTO_DATA_BASE_PARAM=(()=>{const p=new URLSearchParams(location.search).get('dataBase');return p&&/^https?:\/\//.test(p)?p.replace(/\/+$/,''):null})();
+const AUTO_CACHE_NAME='erdh-data-v1';
+async function autoCacheGet(url){try{if(!('caches' in window))return null;const c=await caches.open(AUTO_CACHE_NAME);const r=await c.match(url);return r?await r.arrayBuffer():null}catch(e){return null}}
+async function autoCachePut(url,bytes){try{if(!('caches' in window))return;const c=await caches.open(AUTO_CACHE_NAME);await c.put(url,new Response(bytes))}catch(e){}}
+async function autoFetchFile(url,name,stage){
+  const cached=await autoCacheGet(url);
+  if(cached){if(stage)setStatus(`${stage}: ${name} — من التخزين المحلي`);return new Uint8Array(cached)}
+  if(stage)setStatus(`${stage}: جارٍ تنزيل ${name}…`);
+  const res=await fetch(url,{cache:'no-store'});
+  if(!res.ok)throw new Error(`فشل تنزيل ${name} (${res.status})`);
+  const total=+(res.headers&&res.headers.get('content-length')||0);
+  const reader=res.body&&res.body.getReader?res.body.getReader():null;
+  if(!reader)return new Uint8Array(await res.arrayBuffer());
+  let received=0;const parts=[];
+  while(true){const step=await reader.read();if(step.done)break;const piece=new Uint8Array(step.value);parts.push(piece);received+=piece.length;if(total&&stage)setStatus(`${stage}: ${name} — ${(received/1048576).toFixed(1)} من ${(total/1048576).toFixed(1)} MB`)}
+  const bytes=new Uint8Array(received);let at=0;for(const p of parts){bytes.set(p,at);at+=p.length}
+  await autoCachePut(url,bytes);
+  return bytes;
+}
+async function autoResolveDataRoot(){
+  if(AUTO_DATA_BASE_PARAM)return AUTO_DATA_BASE_PARAM+'/';
+  if(SELECTED_MODEL_FILES&&ASR.dataBase)return ASR.dataBase;
+  for(const root of dataRootCandidates()){
+    const ping=await probeAsset(root+'surah_info.json');
+    if(ping.ok)return root;
+  }
+  throw new Error('لم يُعثر على مجلد data عبر الإنترنت (surah_info.json غير موجود). ارفع ملفات data إلى الموقع ثم أعد المحاولة.');
+}
+async function autoFetchAny(cands,name,stage){
+  let lastErr=null;
+  for(const url of cands){
+    try{const bytes=await autoFetchFile(url,name,stage);return {bytes,fname:url.split('/').pop()}}
+    catch(e){lastErr=e}
+  }
+  throw lastErr;
+}
+async function autoBuildVirtualFolder(){
+  if(state.dataReady&&SELECTED_MODEL_FILES)return SELECTED_MODEL_FILES;
+  const dataDir=await autoResolveDataRoot();
+  const onnxDir=dataDir+'onnx/',sherpaDir=dataDir+'sherpa/';
+  const required=[
+    ['qpc_hafs.json',[dataDir+'qpc_hafs.json']],
+    ['surah_info.json',[dataDir+'surah_info.json']],
+    ['ordered_quran_phonemes.json',[dataDir+'ordered_quran_phonemes.json']],
+    ['quran_asr_tokens.json',[onnxDir+'quran_asr_tokens.json',onnxDir+'quran_tokens.txt']]
+  ];
+  const optional=[
+    ['silero_vad.onnx',[onnxDir+'silero_vad.onnx']],
+    ['sherpa-onnx-wasm-main-asr.js',[sherpaDir+'sherpa-onnx-wasm-main-asr.js']],
+    ['sherpa-onnx-wasm-main-asr.wasm',[sherpaDir+'sherpa-onnx-wasm-main-asr.wasm']],
+    ['zipformer_p_arabic_v3.1.int8.onnx',[onnxDir+'zipformer_p_arabic_v3.1.int8.onnx',onnxDir+'zipformer_p_arabic_v3.int8.onnx']],
+    ['fastconformer_ar_ctc_q8.onnx',[onnxDir+'fastconformer_ar_ctc_q8.onnx']],
+    ['qurankarim-fastconformer-mixed.onnx',[onnxDir+'qurankarim-fastconformer-mixed.onnx']]
+  ];
+  const map=new Map();
+  for(const [key,cands] of required){
+    const got=await autoFetchAny(cands,key,'الخطوة ١ من ٢: بيانات المصحف');
+    map.set(got.fname,new File([got.bytes],got.fname,{type:'application/octet-stream'}));
+  }
+  for(const [key,cands] of optional){
+    try{const got=await autoFetchAny(cands,key,'الخطوة ٢ من ٢: المحركات المحلية (اختياري)');map.set(got.fname,new File([got.bytes],got.fname,{type:'application/octet-stream'}))}
+    catch(e){diagnostic('ملف اختياري غير متاح في الوضع التلقائي',{key,error:e.message||e})}
+  }
+  if(!map.has('quran_asr_tokens.json')&&!map.has('quran_tokens.txt'))throw new Error('ملف الرموز غير متاح عبر الإنترنت (quran_asr_tokens.json أو quran_tokens.txt). ارفعه إلى الموقع ثم أعد المحاولة.');
+  SELECTED_MODEL_FILES=map;
+  ASR.dataBase=dataDir;
+  ASR.selectedFolderName='التحميل التلقائي من الإنترنت';
+  ASR.selectedModelFiles=[...map.values()].map(f=>({name:f.name,relativePath:'data/'+f.name,size:f.size}));
+  diagnostic('مجلد افتراضي عبر الإنترنت (تحميل تلقائي كامل)',ASR.selectedModelFiles.map(f=>({name:f.name,sizeMB:(f.size/1048576).toFixed(2)})));
+  return map;
+}
+async function autoLoadAtBoot(){
+  if(!AUTO_DATA_MODE)return tryAutoLoadSiblingData();
+  const retry=$('#autoRetryBtn');if(retry)retry.hidden=true;
+  const gate=$('#fullscreenGate');if(gate)gate.classList.add('hidden');
+  try{
+    setStatus('جارٍ تجهيز البيانات تلقائيًا من الإنترنت…');
+    const map=await autoBuildVirtualFolder();
+    await loadExternalQuranData(map);
+    markDataFolderReady('data عبر الإنترنت');
+    setStatus('اكتمل التحميل التلقائي. جارٍ تجهيز المحرك…');
+    await autoEngineBoot(map);
+  }catch(err){
+    const msg=err.message||String(err);
+    diagnostic('فشل التحميل التلقائي',msg);
+    setStatus('تعذر التحميل التلقائي: '+msg);
+    if(retry){retry.hidden=false;retry.textContent='⚠ إعادة المحاولة'}
+    throw err;
+  }
+}
+async function autoEngineBoot(map){
+  const engine=state.settings.recognitionEngine||'smart';
+  const hasLocalModels=[...map.keys()].some(k=>/^(zipformer_p_arabic_v3(?:\.1)?\.int8\.onnx|fastconformer_ar_ctc_q8\.onnx|qurankarim-fastconformer-mixed\.onnx)$/.test(k));
+  if(engine==='quran'){
+    if(!QLab.ready)qlabInit();
+    setStatus(QLab.ready?'Quran Lab (TajweedFormer) جاهز. اضغط «بدء التسميع».':'جارٍ تجهيز محرك Quran Lab (أول استخدام ينزّل النموذج)…');
+    return;
+  }
+  if(!hasLocalModels){
+    diagnostic('الوضع التلقائي: النماذج المحلية غير متوفرة — الاعتماد على محرك Quran Lab',{engine});
+    setStatus('النماذج المحلية (Zipformer/FastConformer) غير متوفرة عبر الإنترنت؛ سيُعتمد محرك Quran Lab (TajweedFormer) تلقائيًا.');
+    if(!QLab.ready)qlabInit();
+    return;
+  }
+  const okSmart=await ensureSherpaEngine();
+  if(okSmart)setStatus(`${ASR.sherpaModelName} جاهز. اضغط «بدء التسميع».`);
+  else setStatus('تعذر المحرك الذكي؛ سيعمل FastConformer تلقائيًا.');
+}
+
 async function probeAsset(url){
   const sizeOf=r=>{
     const cr=r.headers.get('content-range');
@@ -4637,8 +4758,8 @@ async function tryAutoLoadSiblingData(){
       return true;
     }catch(e){diagnostic('تعذر اعتماد مجلد data المكتشف',String(e));SELECTED_MODEL_FILES=null}
   }
-  if(btn){btn.classList.add('loading');btn.classList.remove('ready');btn.textContent='⚠ اختر مجلد data'}
-  setStatus('تعذر فتح مجلد data تلقائيًا. اختره يدويًا بالزر.');
+  const retry=$('#autoRetryBtn');if(retry){retry.hidden=false;retry.textContent='⚠ إعادة المحاولة'}
+  setStatus('تعذر فتح مجلد data تلقائيًا. أعد المحاولة بالزر، أو شغّل الصفحة عبر الإنترنت.');
   return false;
 }
 async function resolveModelPath(){
@@ -4711,10 +4832,9 @@ function setupLocalASR(){
   ort.env.wasm.numThreads=self.crossOriginIsolated?Math.min(2,navigator.hardwareConcurrency||1):1;
   ort.env.wasm.proxy=false;
   setAIStatus('runtime',location.protocol==='file:'?'مدمج · جاهز':`جاهز · ${ort.env.wasm.numThreads} خيط`,'ready');console.info('ONNX Runtime',ort?.env?.versions||'loaded','Runtime path:',RUNTIME_PATH,'Model candidates:',MODEL_PATHS);
-  setAIStatus('smart','اختر data لتحميل WASM','idle');setAIStatus('asr',location.protocol==='file:'?'اختر المجلد':'بانتظار البدء');setAIStatus('vad',location.protocol==='file:'?'اختر المجلد':'بانتظار البدء');
-  // Keep folder button in loading state until data is loaded
-  const folderBtn=$('#chooseModelsBtn');
-  if(!state.dataReady){folderBtn.classList.add('loading');folderBtn.classList.remove('ready');folderBtn.textContent='⚠ اختر مجلد data'}
+  setAIStatus('smart','التحميل التلقائي جارٍ','idle');setAIStatus('asr','بانتظار البدء');setAIStatus('vad','بانتظار البدء');
+  // (v2.2.4) اختياري مجلد data يدويًا؛ زر «إعادة المحاولة» يظهر فقط عند فشل التحميل التلقائي
+  const retryBtn=$('#autoRetryBtn');if(retryBtn)retryBtn.hidden=true;
 }
 async function loadTokens(){
   if(ASR.tokens.length)return;
@@ -5537,7 +5657,7 @@ async function getPersistentMicStream(){
   const active=ASR.sharedMicStream?.getAudioTracks()?.some(track=>track.readyState==='live');
   if(active&&ASR.sharedMicDeviceId===ASR.selectedDeviceId)return ASR.sharedMicStream;
   ASR.sharedMicStream?.getTracks().forEach(track=>track.stop());ASR.sharedMicStream=null;
-  const smartMode=(state.settings.recognitionEngine||'smart')==='smart',base={channelCount:1,echoCancellation:!smartMode,noiseSuppression:!smartMode,autoGainControl:false,...(ASR.selectedDeviceId?{deviceId:{exact:ASR.selectedDeviceId}}:{})};
+  const smartMode=(state.settings.recognitionEngine||'smart')==='smart'||state.settings.recognitionEngine==='quran',base={channelCount:1,echoCancellation:!smartMode,noiseSuppression:!smartMode,autoGainControl:false,...(ASR.selectedDeviceId?{deviceId:{exact:ASR.selectedDeviceId}}:{})};
   try{ASR.sharedMicStream=await navigator.mediaDevices.getUserMedia({audio:base,video:false})}
   catch(error){if(!ASR.selectedDeviceId)throw error;diagnostic('تعذر فتح الميكروفون المحفوظ، استخدام الافتراضي',String(error));ASR.selectedDeviceId='';state.settings.micDeviceId='';ASR.sharedMicStream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1},video:false})}
   ASR.sharedMicDeviceId=ASR.selectedDeviceId;const track=ASR.sharedMicStream.getAudioTracks()[0];ASR.selectedDeviceLabel=track?.label||ASR.selectedDeviceLabel;state.settings.micDeviceLabel=ASR.selectedDeviceLabel;state.settings.micConfigured=true;saveStored();$('#deviceBadge').textContent=`الميكروفون: ${ASR.selectedDeviceLabel}`;diagnostic('فتح ميكروفون دائم أثناء الزيارة',{label:track?.label,settings:track?.getSettings()});return ASR.sharedMicStream;
@@ -6119,6 +6239,118 @@ async function processAudioFile(file){
 function openDiagnostics(){refreshDiagnostics();$('#diagnosticsModal').classList.remove('hidden')}
 function copyText(text,message){navigator.clipboard?.writeText(text).then(()=>toast(message)).catch(()=>{const area=document.createElement('textarea');area.value=text;document.body.append(area);area.select();document.execCommand('copy');area.remove();toast(message)})}
 
+// ============ Quran Lab — TajweedFormer SDK (v2.2.4: محرك رئيسي اختياري 'quran') ============
+// الـ SDK محرك استنتاج: الصوت يدخل، وما سمعه النموذج يخرج (chunk.decoded.text).
+// التطبيق يبني تطابقه الخاص لهذا الخرج على كلماته (مطابقة نصية مبسطة — v1).
+// المفتاح في quranlab-key.js (ملف git-ignored): window.QURANLAB_KEY — بدون مفتاح/نموذج ⇒ رجوع تلقائي للمحرك الذكي.
+const QLab={client:null,model:null,session:null,ready:false,err:null,normAcc:'',consumed:0,lastChunkAt:0,wordCursor:0,progress:{done:0,total:0}};
+const QLAB_NOTICE_TEXT='Automatic tajweed feedback can be wrong. It does not replace a qualified teacher.';
+function updateQLabNotice(){const el=$('#qlabNotice');if(!el)return;const on=state.listening&&ASR.activeEngine==='quran'&&QLab.ready;el.style.display=on?'block':'none';if(on)el.textContent=QLAB_NOTICE_TEXT}
+function setQlabProgress(done,total,doneState){
+  QLab.progress={done:done||0,total:total||0};
+  const box=$('#qlabProgress');if(!box)return;
+  if(doneState==='done'){box.classList.add('hidden');box.classList.remove('qp-indet');return}
+  box.classList.remove('hidden');
+  const pct=(total&&done!=null&&isFinite(done/total))?Math.min(100,Math.round((done/total)*100)):null;
+  const fill=$('#qpFill'),pctEl=$('#qpPct'),sub=$('#qpSub');
+  if(fill)fill.style.width=(pct==null?'100%':pct+'%');
+  if(pctEl)pctEl.textContent=(pct==null?'…':pct+'٪');
+  if(sub)sub.textContent=(total&&done!=null)?(done/1048576).toFixed(1)+' من '+(total/1048576).toFixed(1)+' MB — يُخزَّن محليًا بعد اكتماله':'أول استخدام فقط — يُخزَّن محليًا بعد اكتماله';
+  box.classList.toggle('qp-indet',pct==null);
+}
+async function qlabInit(){
+  if(QLab.ready||QLab.client)return QLab.ready;
+  const key=(typeof window.QURANLAB_KEY==='string')?window.QURANLAB_KEY.trim():'';
+  if(!key){QLab.err='no_key';return false}
+  try{
+    const {TajweedClient}=await import('https://cdn.jsdelivr.net/npm/@quran-lab/tajweedformer@3.1.6/web/index.js');
+    QLab.client=await TajweedClient.create({key,appVersion:'2.2.5'});
+    const pfShown=setTimeout(()=>setQlabProgress(null,null),400);
+    try{
+      const pf=await QLab.client.prefetch({onProgress:p=>{clearTimeout(pfShown);setQlabProgress(p.bytesDone,p.bytesTotal)}});
+      clearTimeout(pfShown);
+      if(pf&&!pf.complete)setQlabProgress(pf.bytesDone,pf.bytesTotal);
+    }catch(e){clearTimeout(pfShown)}
+    QLab.model=await QLab.client.model();
+    QLab.ready=true;
+    setQlabProgress(null,null,'done');
+    diagnostic('Quran Lab جاهز (TajweedFormer V4)',{model:QLab.model.id,version:QLab.model.version,backend:QLab.model.backend&&QLab.model.backend.name});
+    return true;
+  }catch(e){QLab.err=e.message||String(e);diagnostic('Quran Lab تعذر التهيئة',QLab.err);setQlabProgress(null,null,'done');return false}
+}
+async function qlabStartSession(){
+  if(!QLab.model||QLab.session)return;
+  try{
+    const sess=await QLab.model.session();
+    QLab.session=sess;QLab.normAcc='';QLab.consumed=0;QLab.lastChunkAt=Date.now();QLab.wordCursor=0;
+    (async()=>{
+      for await(const chunk of sess.chunks)processQuranLabChunk(chunk);
+      if(QLab.session!==sess)return;
+      if(state.desiredListening){QLab.session=null;diagnostic('Quran Lab: انتهت الجولة — جولة جديدة (التلاوة مستمرة)',{});await qlabStartSession()}
+    })().catch(e=>{diagnostic('Quran Lab: خطأ في التدفق',String(e))});
+  }catch(e){QLab.err=e.message||String(e);diagnostic('Quran Lab: تعذر إنشاء الجلسة',QLab.err);QLab.session=null}
+}
+async function qlabStopSession(){
+  const sess=QLab.session;QLab.session=null;
+  if(!sess)return;
+  try{await sess.finish()}catch(e){}
+}
+function processQuranLabChunk(chunk){
+  QLab.lastChunkAt=Date.now();
+  const decoded=chunk&&chunk.decoded;if(!decoded)return;
+  const norm=normalizeArabic(String(decoded.text||''));
+  if(norm.length<QLab.normAcc.length){QLab.normAcc='';QLab.consumed=0}
+  else QLab.normAcc=norm;
+  const words=flatWords();
+  while(state.current<words.length){
+    const expected=normalizeArabic(words[state.current]||'');
+    if(!expected)break;
+    let i0=QLab.consumed;while(i0<QLab.normAcc.length&&QLab.normAcc[i0]===' ')i0++;
+    const tail=QLab.normAcc.slice(i0);
+    if(!tail.length)break;
+    if(tail.startsWith(expected)){
+      QLab.consumed=i0+expected.length;
+      state.wordHistory.push({index:state.current,wasCorrect:false,wasFailed:false});
+      state.correct.add(state.current);markMistakesCorrected([state.current]);
+      if(isHardWord(words[state.current]))markHardWordProgress(hardWordKey(words[state.current]));
+      const word=words[state.current];
+      recordQlabWordTiming(state.current,word,expected,decoded);
+      state.current++;ASR.lastCommitAt=Date.now();
+      renderTasmee();updateErrorReportBadge();
+      setStatus(`Quran Lab طابق «${word}»`,'listening');
+      if(state.current>=words.length){finishSession();break}
+      continue;
+    }
+    if(expected.startsWith(tail)&&tail.length>=2)break;
+    if(tail.length>expected.length+6){
+      QLab.consumed=QLab.normAcc.length;
+      onWordFailureEnd(state.current,tail.slice(0,40),0);
+    }
+    break;
+  }
+}
+function recordQlabWordTiming(wordIndex,word,expected,decoded){
+  try{
+    const dwords=decoded&&Array.isArray(decoded.words)?decoded.words:[];
+    if(!dwords.length)return;
+    let found=-1,foundWord=null;
+    for(let k=Math.max(0,QLab.wordCursor);k<dwords.length;k++){
+      const nw=normalizeArabic(String(dwords[k].text||''));
+      if(!nw)continue;
+      if(nw===expected||(nw.length>=2&&(nw.startsWith(expected)||expected.startsWith(nw)))){found=k;foundWord=dwords[k];break}
+    }
+    if(found<0)return;
+    QLab.wordCursor=found+1;
+    const start=(Number(foundWord.firstMs)||0)/1000;
+    const end=((Number(foundWord.lastMs)||0)+40)/1000;
+    const duration=Math.max(.08,end-start);
+    const timing={text:word,start,end,duration,tokens:(foundWord.tokens||[]).map(t=>t.name||''),engine:'quran',confidence:foundWord.confidence==null?null:Number(foundWord.confidence)};
+    ASR.lastWordTimings.push(timing);
+    const meta=flatTajweedMeta()[wordIndex];
+    if(meta)recordTajweedAnalysis({index:wordIndex,target:word,spoken:word,timing},meta);
+    diagnostic('توقيت كلمة من Quran Lab (V4)',{word,duration_ms:Math.round(duration*1000)});
+  }catch(e){}
+}
 async function startListening(){
   ASR.manualAdvanceEpoch=(ASR.manualAdvanceEpoch||0)+1;
 
@@ -6128,15 +6360,16 @@ async function startListening(){
     try{if(!ASR.mobileWarmContext){ASR.mobileWarmContext=new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'});await ASR.mobileWarmContext.resume()}await getPersistentMicStream()}
     catch(error){diagnostic('تعذر ميكروفون الهاتف المباشر',String(error));toast('تعذر البث المباشر؛ سيتم فتح مسجل الهاتف كخيار احتياطي.');try{$('#mobileRecordInput').click()}catch(e){}return}
   }else if(!state.settings.micConfigured){ASR.pendingMicAction='listen';await openMicTest();setStatus('اختر الميكروفون واضغط «استخدام هذا الميكروفون» مرة واحدة فقط.');return}
-  setStatus('جاري تهيئة محرك التعرف المحلي؛ قد تستغرق المرة الأولى قليلًا…');
-  {const smartReady=await ensureSherpaEngine();if(smartReady){ASR.activeEngine='smart';ASR.smartFailures=0;resetSherpaTracking()}else{if(location.protocol==='file:'&&!SELECTED_MODEL_FILES)return;setStatus('تعذر تهيئة Zipformer/Sherpa. اختر مجلد data الذي يحتوي نموذج Zipformer وملفات Sherpa WASM.');return}}
+  setStatus('جاري تهيئة محرك التعرف؛ قد تستغرق المرة الأولى قليلًا…');
+  const wantEngine=state.settings.recognitionEngine||'smart';let quranTaken=false;if(wantEngine==='quran'){const quranReady=await qlabInit();if(quranReady){await qlabStartSession();if(QLab.session){ASR.activeEngine='quran';quranTaken=true}else{setStatus('تعذرت جلسة Quran Lab — سأستخدم المحرك الذكي.','listening')}}else{setStatus(`Quran Lab غير متاح (${QLab.err}) — سأستخدم المحرك الذكي.`,'listening')}}
+  if(!quranTaken){const smartReady=await ensureSherpaEngine();if(smartReady){ASR.activeEngine='smart';ASR.smartFailures=0;resetSherpaTracking()}else{if(location.protocol==='file:'&&!SELECTED_MODEL_FILES)return;setStatus('تعذر تهيئة المحرك المحلي (Zipformer/Sherpa). تأكد من رفع ملفات data على الموقع أو اختر محرك Quran Lab من الإعدادات ثم أعد المحاولة.');return}}
   try{
     ASR.stream=await getPersistentMicStream();const track=ASR.stream.getAudioTracks()[0],settings=track.getSettings();track.onended=()=>recoverMicrophoneAutomatically('انتهى تدفق الميكروفون');track.onmute=()=>{ASR.trackMutedAt=Date.now()};track.onunmute=()=>{ASR.trackMutedAt=0};ASR.selectedDeviceLabel=track.label||'الميكروفون المحدد';$('#deviceBadge').textContent=`الميكروفون: ${ASR.selectedDeviceLabel}`;
     diagnostic('بدء جلسة التسميع على الميكروفون المحفوظ',{label:track.label,settings});
     ASR.audioContext=ASR.mobileWarmContext||new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'});ASR.mobileWarmContext=null;await ASR.audioContext.resume();
     ASR.source=ASR.audioContext.createMediaStreamSource(ASR.stream);ASR.processor=ASR.audioContext.createScriptProcessor(4096,1,1);ASR.mute=ASR.audioContext.createGain();ASR.mute.gain.value=0;
     ASR.rawParts=[];ASR.rawSamples=0;ASR.processor.onaudioprocess=e=>capturePCM(e.inputBuffer.getChannelData(0));ASR.source.connect(ASR.processor);ASR.processor.connect(ASR.mute);ASR.mute.connect(ASR.audioContext.destination);
-    state.desiredListening=true;state.listening=true;ASR.lastSherpaTextAt=Date.now();ASR.lastCommitAt=Date.now();ASR.stallCount=0;ASR.stallGraceUntil=Date.now()+5000;startMicrophoneWatchdog();updateMic();scheduleTasmeeLayout('listening-ready');setStatus(`أستمع عبر ${ASR.selectedDeviceLabel} · ${ASR.activeEngine==='smart'?'Zipformer الذكي':'FastConformer'}…`,'listening');
+    state.desiredListening=true;state.listening=true;ASR.lastSherpaTextAt=Date.now();ASR.lastCommitAt=Date.now();ASR.stallCount=0;ASR.stallGraceUntil=Date.now()+5000;startMicrophoneWatchdog();updateMic();updateQLabNotice();scheduleTasmeeLayout('listening-ready');setStatus(`أستمع عبر ${ASR.selectedDeviceLabel} · ${ASR.activeEngine==='smart'?'Zipformer الذكي':ASR.activeEngine==='quran'?'Quran Lab (TajweedFormer)':'FastConformer'}…`,'listening');
   }catch(e){console.error(e);diagnostic('خطأ فتح الميكروفون',String(e));toast('تعذّر فتح الميكروفون؛ راجع الإذن أو اختبر جهازًا آخر.');setStatus(`خطأ الميكروفون: ${e.message||e}`);await stopListening()}
 }
 function handleAudioActivity(dbfs){
@@ -6156,21 +6389,21 @@ function handleAudioActivity(dbfs){
     stopListening().then(()=>setStatus('توقف الاستماع تلقائيًا بعد دقيقتين. اضغط «ابدأ التسميع المحلي» للمتابعة.'));
   }
 }
-function startMicrophoneWatchdog(){clearInterval(ASR.watchdogTimer);ASR.lastVoiceAt=Date.now();ASR.silenceResetDone=false;ASR.watchdogTimer=setInterval(async()=>{if(!state.desiredListening)return;try{if(ASR.activeEngine==='smart'&&ASR.sherpaReady&&!ASR.rescueActive&&!ASR.processingFile){const nowW=Date.now();if(nowW>ASR.stallGraceUntil){const voiceRecent=ASR.lastVoiceAt&&nowW-ASR.lastVoiceAt<4000,noText=nowW-(ASR.lastSherpaTextAt||0)>4500;if(voiceRecent&&noText){ASR.stallCount++;diagnostic('Zipformer لا يُخرج فونيمات رغم وجود صوت',{stall:ASR.stallCount,dbfs:Math.round(ASR.lastDbfs)});if(ASR.stallCount===1)setStatus('الميكروفون يعمل لكن النموذج لا يخرج فونيمات — أُعيد ضبط تدفق Zipformer تلقائيًا…','listening');const stampKeep=ASR.lastSherpaTextAt;resetSherpaTracking();ASR.lastSherpaTextAt=stampKeep;if(ASR.stallCount>=2&&state.settings.autoEngineFallback!==false)startRescueSwitch('سكت Zipformer مرتين متتاليتين رغم وجود صوت')}else ASR.stallCount=0}}if(ASR.audioContext?.state==='suspended')await ASR.audioContext.resume();const track=ASR.sharedMicStream?.getAudioTracks()?.[0];if(!track||track.readyState!=='live'){await recoverMicrophoneAutomatically('انتهى تدفق الميكروفون')}else if(track.muted){ASR.trackMutedAt=ASR.trackMutedAt||Date.now();if(Date.now()-ASR.trackMutedAt>120000){stopListening().then(()=>setStatus('توقف الاستماع تلقائيًا بعد دقيقتين. اضغط «ابدأ التسميع المحلي» للمتابعة.'))}}else ASR.trackMutedAt=0}catch(error){diagnostic('خطأ مراقب الميكروفون',String(error))}},3000)}
+function startMicrophoneWatchdog(){clearInterval(ASR.watchdogTimer);ASR.lastVoiceAt=Date.now();ASR.silenceResetDone=false;ASR.watchdogTimer=setInterval(async()=>{if(!state.desiredListening)return;updateQLabNotice();try{if(ASR.activeEngine==='smart'&&ASR.sherpaReady&&!ASR.rescueActive&&!ASR.processingFile){const nowW=Date.now();if(nowW>ASR.stallGraceUntil){const voiceRecent=ASR.lastVoiceAt&&nowW-ASR.lastVoiceAt<4000,noText=nowW-(ASR.lastSherpaTextAt||0)>4500;if(voiceRecent&&noText){ASR.stallCount++;diagnostic('Zipformer لا يُخرج فونيمات رغم وجود صوت',{stall:ASR.stallCount,dbfs:Math.round(ASR.lastDbfs)});if(ASR.stallCount===1)setStatus('الميكروفون يعمل لكن النموذج لا يخرج فونيمات — أُعيد ضبط تدفق Zipformer تلقائيًا…','listening');const stampKeep=ASR.lastSherpaTextAt;resetSherpaTracking();ASR.lastSherpaTextAt=stampKeep;if(ASR.stallCount>=2&&state.settings.autoEngineFallback!==false)startRescueSwitch('سكت Zipformer مرتين متتاليتين رغم وجود صوت')}else ASR.stallCount=0}}if(ASR.activeEngine==='quran'&&QLab.session&&!ASR.rescueActive){const nowQ=Date.now();if(nowQ>ASR.stallGraceUntil){const voiceQ=ASR.lastVoiceAt&&nowQ-ASR.lastVoiceAt<4000,noChunk=nowQ-QLab.lastChunkAt>6000;if(voiceQ&&noChunk){ASR.stallCount++;diagnostic('Quran Lab: صوت بلا خرج',{stall:ASR.stallCount});if(ASR.stallCount===1)setStatus('Quran Lab أبطأ من المعتاد — جارٍ المتابعة…','listening');if(ASR.stallCount>=2){ASR.stallCount=0;diagnostic('Quran Lab: فتح جلسة جديدة',{reason:'ركودان متتاليان'});await qlabStopSession();await qlabStartSession()}}else ASR.stallCount=0}}if(ASR.audioContext?.state==='suspended')await ASR.audioContext.resume();const track=ASR.sharedMicStream?.getAudioTracks()?.[0];if(!track||track.readyState!=='live'){await recoverMicrophoneAutomatically('انتهى تدفق الميكروفون')}else if(track.muted){ASR.trackMutedAt=ASR.trackMutedAt||Date.now();if(Date.now()-ASR.trackMutedAt>120000){stopListening().then(()=>setStatus('توقف الاستماع تلقائيًا بعد دقيقتين. اضغط «ابدأ التسميع المحلي» للمتابعة.'))}}else ASR.trackMutedAt=0}catch(error){diagnostic('خطأ مراقب الميكروفون',String(error))}},3000)}
 async function recoverMicrophoneAutomatically(reason){if(ASR.micRecovering||!state.desiredListening)return;ASR.micRecovering=true;diagnostic('استعادة تلقائية للميكروفون',reason);setStatus(`${reason} — استعادة تلقائية دون فقد موضع القراءة…`,'listening');try{await stopListening();releasePersistentMic();await new Promise(resolve=>setTimeout(resolve,250));await startListening();setStatus('تمت استعادة الميكروفون تلقائيًا. واصل القراءة.','listening')}catch(error){setStatus(`تعذرت استعادة الميكروفون: ${error.message||error}`)}finally{ASR.micRecovering=false}}
 
 function capturePCM(channel){
   if(!state.desiredListening)return;const copy=new Float32Array(channel),now=performance.now(),sr=ASR.audioContext.sampleRate,dbfs=20*Math.log10(Math.max(rmsOf(copy),1e-8));handleAudioActivity(dbfs);
   if(!ASR.lastMeterAt||now-ASR.lastMeterAt>120){updateSignalMeter(dbfs);ASR.lastMeterAt=now}
-  if(ASR.activeEngine==='smart'&&ASR.sherpaReady){feedSherpaPcm(resampleLinear(copy,sr,16000));return}
+  if(ASR.activeEngine==='quran'&&QLab.session){try{QLab.session.push(resampleLinear(copy,sr,16000))}catch(e){QLab.err=e.message||String(e)}return}if(ASR.activeEngine==='smart'&&ASR.sherpaReady){feedSherpaPcm(resampleLinear(copy,sr,16000));return}
   ASR.rawParts.push(copy);ASR.rawSamples+=copy.length;const needed=Math.round(sr*(ASR.rescueActive?2.5:state.settings.chunkSeconds));if(ASR.rawSamples<needed)return;
   const all=concatFloat(ASR.rawParts,ASR.rawSamples),keep=Math.min(all.length,Math.round(sr*.8)),chunk=all.slice();ASR.rawParts=[all.slice(all.length-keep)];ASR.rawSamples=keep;enqueueAudio(resampleLinear(chunk,sr,16000));
 }
 async function stopListening(){
-  state.desiredListening=false;state.listening=false;if(ASR.rescueActive&&ASR.rescueResolve){const r=ASR.rescueResolve;ASR.rescueResolve=null;setTimeout(r,30)}clearInterval(ASR.watchdogTimer);ASR.watchdogTimer=0;const sr=ASR.audioContext?.sampleRate||48000;
+  state.desiredListening=false;state.listening=false;if(ASR.rescueActive&&ASR.rescueResolve){const r=ASR.rescueResolve;ASR.rescueResolve=null;setTimeout(r,30)}clearInterval(ASR.watchdogTimer);ASR.watchdogTimer=0;if(ASR.activeEngine==='quran'){await qlabStopSession()}const sr=ASR.audioContext?.sampleRate||48000;
   if(ASR.activeEngine==='smart'&&ASR.sherpaReady&&ASR.sherpaBuffer.length){const finalChunk=new Float32Array(5120);finalChunk.set(ASR.sherpaBuffer.slice(0,5120));ASR.sherpaBuffer=new Float32Array(0);window.processAudioSamples?.(finalChunk)}else if(ASR.rawSamples>sr*.65){const all=concatFloat(ASR.rawParts,ASR.rawSamples);enqueueAudio(resampleLinear(all,sr,16000))}
   ASR.rawParts=[];ASR.rawSamples=0;try{ASR.processor?.disconnect();ASR.source?.disconnect();ASR.mute?.disconnect()}catch(e){}try{await ASR.audioContext?.close()}catch(e){}
-  ASR.stream=null;ASR.audioContext=null;ASR.source=null;ASR.processor=null;ASR.mute=null;updateSignalMeter(-90,0);updateMic();
+  ASR.stream=null;ASR.audioContext=null;ASR.source=null;ASR.processor=null;ASR.mute=null;updateSignalMeter(-90,0);updateMic();updateQLabNotice();
 }
 async function toggleListening(){if(state.desiredListening)await stopListening();else await startListening()}
 function updateMic(){const b=$('#micBtn'),page=$('#page-tasmee');b.classList.toggle('danger',state.desiredListening);b.classList.toggle('primary',!state.desiredListening);b.querySelector('span').textContent=state.desiredListening?'إيقاف الاستماع':'ابدأ التسميع المحلي';page.classList.toggle('listening-mode',state.desiredListening);scheduleTasmeeLayout(state.desiredListening?'listening-state':'stopped-state');if(state.settings.window&&flatWords().length>45){requestAnimationFrame(()=>{const wrap=$('#tasmeeWords');if(!wrap)return;const current=wrap.querySelector(`.word[data-index="${Math.min(state.current,Math.max(0,flatWords().length-1))}"]`);if(current&&!state.desiredListening){const sc=wrap;const r=current.getBoundingClientRect(),cr=sc.getBoundingClientRect();if(r.bottom>cr.bottom||r.top<cr.top){sc.scrollTo({top:Math.max(0,sc.scrollTop+(r.top-cr.top)-Math.max(12,(cr.height-r.height)*.25)),behavior:'smooth'})}}})}}
@@ -6222,16 +6455,12 @@ function renderSurahModal(query=''){
 function openSurahs(){if(!state.dataReady)return setStatus('حمّل مجلد data أولًا.');renderSurahModal();$('#surahSearch').value='';$('#surahModal').classList.remove('hidden');setTimeout(()=>$('#surahSearch').focus(),50)}function closeModals(){$$('.modal-backdrop').forEach(m=>m.classList.add('hidden'))}
 function renderSettings(){document.documentElement.style.setProperty('--blur',`${state.settings.blur}px`);$('#recognitionEngineSelect').value=state.settings.recognitionEngine||'smart';$('#ignoreSingleLetterSwitch').checked=state.settings.ignoreSingleLetter!==false;$('#detectSingleLetterSwitch').checked=state.settings.detectSingleLetter!==false;$('#autoEngineFallbackSwitch').checked=state.settings.autoEngineFallback!==false;$('#modelSelect').value=state.settings.model||'auto';$('#vadRange').value=state.settings.vadThreshold*100;$('#vadValue').textContent=`${fmt(state.settings.vadThreshold*100)}٪`;$('#chunkRange').value=Math.round(state.settings.chunkSeconds*10);$('#chunkValue').textContent=`${fmt(state.settings.chunkSeconds)} ث`;$('#thresholdRange').value=state.settings.threshold*100;$('#thresholdValue').textContent=`${fmt(state.settings.threshold*100)}٪`;$('#blurRange').value=state.settings.blur;$('#blurValue').textContent=`${fmt(state.settings.blur)} بكسل`;$('#lookaheadSwitch').checked=state.settings.lookahead;$('#autoRewindSwitch').checked=state.settings.autoRewind!==false;$('#soundSwitch').checked=state.settings.sound;$('#tajweedSwitch').checked=state.settings.tajweedEnabled!==false;$('#tajweedDifficulty').value=state.settings.tajweedDifficulty||'normal';$('#harakatSwitch').checked=state.settings.harakatEnabled!==false;$('#windowSwitch').checked=state.settings.window;$('#mushafStyleSwitch').checked=state.settings.mushafStyle===true}
 function renderProgress(){const h=state.history;if(!h.length){$('#overallRing').style.setProperty('--p',0);$('#overallAccuracy').textContent='—';$('#sessionsCount').textContent='لا توجد جلسات بعد';$('#bestSurah').textContent='—';$('#bestMeta').textContent='—';$('#activityList').innerHTML='<div class="empty-activity">لم تُسجّل جلسات بعد. ابدأ من صفحة التسميع الذكي.</div>';return}const avg=Math.round(h.reduce((n,x)=>n+x.accuracy,0)/h.length),best=[...h].sort((a,b)=>b.accuracy-a.accuracy)[0];$('#overallRing').style.setProperty('--p',avg);$('#overallAccuracy').textContent=`${fmt(avg)}٪`;$('#sessionsCount').textContent=`${fmt(h.length)} جلسة محفوظة`;$('#bestSurah').textContent=`سورة ${cleanName(QURAN[best.surahId-1].nameAr)}`;$('#bestMeta').textContent=`دقّة ${fmt(best.accuracy)}٪ · ${fmt(best.correct)} كلمة صحيحة`;$('#activityList').innerHTML=h.slice(0,10).map(x=>{const d=new Date(x.time).toLocaleDateString('ar-DZ',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});return `<div class="activity-row"><div><b>سورة ${escapeHtml(cleanName(QURAN[x.surahId-1].nameAr))}</b><small>${d} · ${fmt(x.correct)} صحيحة · ${fmt(x.mistakes)} أخطاء</small></div><strong style="color:${x.accuracy>=80?'var(--success)':'var(--gold)'}">${fmt(x.accuracy)}٪</strong></div>`}).join('')}
-function renderAll(){renderSettings();if(!state.dataReady||!QURAN.length){setStatus('اختر مجلد data الرئيسي لتحميل مصحف حفص والبيانات الفونيمية والنماذج.');return}renderTasmee();renderLesson();renderReader();renderProgress()}
+function renderAll(){renderSettings();if(!state.dataReady||!QURAN.length){setStatus('جارٍ التحميل التلقائي لمصحف حفص والبيانات الفونيمية والنماذج من الإنترنت…');return}renderTasmee();renderLesson();renderReader();renderProgress()}
 
 $$('[data-page]').forEach(b=>b.onclick=()=>showPage(b.dataset.page));$$('[data-open-surahs]').forEach(b=>b.onclick=openSurahs);$$('[data-close-modal]').forEach(b=>b.onclick=closeModals);$$('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModals()}));
-$('#chooseModelsBtn').onclick=async()=>{
-  const btn=$('#chooseModelsBtn');
-  btn.classList.add('loading');btn.classList.remove('ready');
-  btn.textContent='⏳ جاري التحميل…';
-  chooseModelFolder();
-};$('#modelFolderInput').onchange=async e=>{if(!e.target.files?.length)return;try{registerModelFolder(e.target.files);await loadExternalQuranData(SELECTED_MODEL_FILES);const btn=$('#chooseModelsBtn');btn.classList.remove('loading');btn.classList.add('ready');btn.textContent='✓ تم التحميل';
-  setStatus('تم العثور على البيانات والنماذج. جارٍ تهيئة المحرك المختار…');if((state.settings.recognitionEngine||'smart')==='smart'){const ready=await ensureSherpaEngine();if(ready){setStatus(`${ASR.sherpaModelName} جاهز. اضغط «بدء التسميع».`);if(state.desiredListening&&ASR.activeEngine==='fast')await switchToSmartEngine('اكتمل تحميل Zipformer أثناء الجلسة')}else setStatus('تعذر تهيئة Zipformer/Sherpa. تحقق من ملفات النموذج داخل مجلد data.')}}catch(err){const msg=err.message||String(err);setStatus(msg);setSpeechSupport(msg);toast('المجلد المحدد غير مكتمل.');const btn=$('#chooseModelsBtn');btn.classList.remove('ready');btn.classList.add('loading');btn.textContent='⚠ اختر مجلد data';}};
+// (v2.2.4) اختياري زر «اختر مجلد data» وحقل الملفات — التحميل من الإنترنت فقط. زر «إعادة المحاولة» يعيد التشغيل الكامل.
+const autoRetryBtn=$('#autoRetryBtn');
+if(autoRetryBtn)autoRetryBtn.onclick=async()=>{autoRetryBtn.hidden=true;autoRetryBtn.textContent='⏳ جاري التحميل…';try{await autoLoadAtBoot()}catch(e){autoRetryBtn.hidden=false;autoRetryBtn.textContent='⚠ إعادة المحاولة';setStatus('تعذر التحميل التلقائي: '+(e.message||e))}};
 $('#micTestBtn').onclick=openMicTest;$('#micDeviceSelect').onchange=e=>startMicTestDevice(e.target.value).catch(err=>toast(err.message||err));$('#useMicBtn').onclick=useTestedMic;$$('[data-close-mic-test]').forEach(b=>b.onclick=closeMicTest);$('#micTestModal').addEventListener('click',e=>{if(e.target.id==='micTestModal')closeMicTest()});
 $$('[data-close-audio-result]').forEach(b=>b.onclick=()=>$('#audioResultModal').classList.add('hidden'));$('#copyResultBtn').onclick=()=>copyText(ASR.lastFileTranscript,'تم نسخ النص.');
 
@@ -6571,12 +6800,12 @@ $('#diagnosticsBtn').onclick=openDiagnostics;$$('[data-close-diagnostics]').forE
 $('#voiceSurahSearchBtn').onclick=voiceSearchSurah;$('#voiceAyahSearchBtn').onclick=voiceSearchAyah;$('#ayahTextSearchBtn').onclick=()=>searchAyahs($('#ayahSearchInput').value,false);$('#ayahSearchInput').onkeydown=e=>{if(e.key==='Enter')searchAyahs(e.target.value,false)};$$('[data-close-ayah-search]').forEach(b=>b.onclick=()=>$('#ayahSearchModal').classList.add('hidden'));
 $('#errorReportBtn').onclick=openErrorReport;$('#completeReportBtn').onclick=()=>{closeModals();openErrorReport()};$$('[data-close-error-report]').forEach(b=>b.onclick=()=>$('#errorReportModal').classList.add('hidden'));$('#checkCorrectionBtn').onclick=()=>verifyCorrection($('#correctionInput').value);$('#correctionInput').onkeydown=e=>{if(e.key==='Enter')verifyCorrection(e.target.value)};$('#voiceCorrectionBtn').onclick=voiceCorrectCurrentRecord;
 $('#modelHelpBtn').onclick=openModelHelp;$$('[data-close-model-help]').forEach(b=>b.onclick=()=>$('#modelHelpModal').classList.add('hidden'));$('#fullscreenBtn').onclick=toggleFullscreen;document.addEventListener('fullscreenchange',()=>{const active=!!document.fullscreenElement;$('#fullscreenBtn').textContent=active?'✕':'⛶';$('#fullscreenBtn').title=active?'الخروج من ملء الشاشة':'الدخول إلى ملء الشاشة';scheduleTasmeeLayout('fullscreen');setTimeout(()=>scheduleTasmeeLayout('fullscreen-settle'),180);setTimeout(()=>scheduleTasmeeLayout('fullscreen-settle-late'),420)});
-$('#readerVoiceSurahBtn').onclick=e=>voiceSearchReaderSurah(e.currentTarget);$('#readerHeaderVoiceSurahBtn').onclick=e=>voiceSearchReaderSurah(e.currentTarget);$('#mobileRecordBtn').onclick=()=>{const input=$('#mobileRecordInput');input.value='';input.click()};$('#mobileRecordInput').onchange=async e=>{const file=e.target.files?.[0];if(file){diagnostic('تسجيل صوتي وارد من مسجل الهاتف',{name:file.name,type:file.type,size:file.size});processAudioFile(file)}};$('#tajweedReportBtn').onclick=openTajweedReport;$$('[data-close-tajweed-report]').forEach(button=>button.onclick=()=>$('#tajweedReportModal').classList.add('hidden'));$('#voiceTajweedCorrectionBtn').onclick=()=>voiceTajweedCorrection();$('#harakatReportBtn').onclick=openHarakatReport;$$('[data-close-harakat-report]').forEach(button=>button.onclick=()=>$('#harakatReportModal').classList.add('hidden'));$('#checkHarakatCorrectionBtn').onclick=()=>verifyHarakatCorrection($('#harakatCorrectionInput').value);$('#harakatCorrectionInput').onkeydown=event=>{if(event.key==='Enter')verifyHarakatCorrection(event.target.value)};$('#voiceHarakatCorrectionBtn').onclick=voiceHarakatCorrection;$('#settingsBtn').onclick=()=>{$('#settingsModal').classList.remove('hidden');renderSettings()};$('#resetSettingsBtn').onclick=resetRecitationSettings;$('#surahSearch').oninput=e=>renderSurahModal(e.target.value);$('#readerSearch').oninput=e=>renderReaderList(e.target.value);$('#sidebarMushafToggle').onclick=()=>{state.settings.mushafStyle=!state.settings.mushafStyle;$('#sidebarMushafToggle').classList.toggle('active',state.settings.mushafStyle);$('#mushafStyleSwitch').checked=state.settings.mushafStyle;renderTasmee();saveStored();setStatus(state.settings.mushafStyle?'تم تفعيل عرض المصحف: بدون مربعات، أرقام الآيات ظاهرة، الأخطاء بالخط السفلي.':'تم إلغاء عرض المصحف والعودة للعرض الافتراضي.')};$('#sidebarMushafToggle').classList.toggle('active',state.settings.mushafStyle===true);$('#micBtn').onclick=async()=>{if(!state.desiredListening){await startListening();}else{await stopListening();}};$('#revealBtn').onclick=revealCurrent;$('#hardWordsBtn').onclick=openHardWords;$$('[data-close-hard-words]').forEach(b=>b.onclick=()=>$('#hardWordsModal').classList.add('hidden'));$('#hardWordsExportBtn').onclick=exportHardWords;$('#hardWordsCopyBtn').onclick=()=>copyText(hardWordsExportText(),'تم نسخ قائمة الكلمات الصعبة.');$('#resetBtn').onclick=()=>resetSession();$('#recognitionEngineSelect').onchange=async e=>{state.settings.recognitionEngine='smart';e.target.value='smart';saveStored();setStatus('المحرك ثابت على Zipformer/Sherpa فقط.');};$('#ignoreSingleLetterSwitch').onchange=e=>{state.settings.ignoreSingleLetter=e.target.checked;saveStored()};$('#detectSingleLetterSwitch').onchange=e=>{state.settings.detectSingleLetter=e.target.checked;saveStored()};$('#autoEngineFallbackSwitch').onchange=e=>{e.target.checked=false;state.settings.autoEngineFallback=false;saveStored()};$('#modelSelect').onchange=async e=>{state.settings.model=e.target.value;saveStored();setStatus('FastConformer غير مستخدم. المحرك الثابت هو Zipformer/Sherpa.');} ;$('#vadRange').oninput=e=>{state.settings.vadThreshold=+e.target.value/100;renderSettings();saveStored()};$('#chunkRange').oninput=e=>{state.settings.chunkSeconds=+e.target.value/10;renderSettings();saveStored()};$('#thresholdRange').oninput=e=>{state.settings.threshold=+e.target.value/100;renderSettings();saveStored()};$('#blurRange').oninput=e=>{state.settings.blur=+e.target.value;renderSettings();renderTasmee();saveStored()};$('#lookaheadSwitch').onchange=e=>{state.settings.lookahead=e.target.checked;saveStored()};$('#autoRewindSwitch').onchange=e=>{state.settings.autoRewind=e.target.checked;ASR.lastAutoRewindSignature='';ASR.lastAutoRewindAt=0;saveStored();diagnostic('تغيير إعادة التلاوة التلقائية داخل الآية',{enabled:e.target.checked})};$('#soundSwitch').onchange=e=>{state.settings.sound=e.target.checked;saveStored()};$('#tajweedSwitch').onchange=e=>{state.settings.tajweedEnabled=e.target.checked;saveStored();updateTajweedSummary();renderTasmee()};$('#tajweedDifficulty').onchange=e=>{state.settings.tajweedDifficulty=e.target.value;saveStored();setStatus('تم تغيير مستوى تدقيق التجويد؛ سيطبق على الكلمات التالية.')};$('#harakatSwitch').onchange=e=>{state.settings.harakatEnabled=e.target.checked;saveStored();updateHarakatSummary();renderTasmee()};$('#windowSwitch').onchange=e=>{state.settings.window=e.target.checked;renderTasmee();saveStored();scheduleTasmeeLayout('window-setting')};$('#mushafStyleSwitch').onchange=e=>{state.settings.mushafStyle=e.target.checked;renderTasmee();saveStored();scheduleTasmeeLayout('mushaf-setting')};
+$('#readerVoiceSurahBtn').onclick=e=>voiceSearchReaderSurah(e.currentTarget);$('#readerHeaderVoiceSurahBtn').onclick=e=>voiceSearchReaderSurah(e.currentTarget);$('#mobileRecordBtn').onclick=()=>{const input=$('#mobileRecordInput');input.value='';input.click()};$('#mobileRecordInput').onchange=async e=>{const file=e.target.files?.[0];if(file){diagnostic('تسجيل صوتي وارد من مسجل الهاتف',{name:file.name,type:file.type,size:file.size});processAudioFile(file)}};$('#tajweedReportBtn').onclick=openTajweedReport;$$('[data-close-tajweed-report]').forEach(button=>button.onclick=()=>$('#tajweedReportModal').classList.add('hidden'));$('#voiceTajweedCorrectionBtn').onclick=()=>voiceTajweedCorrection();$('#harakatReportBtn').onclick=openHarakatReport;$$('[data-close-harakat-report]').forEach(button=>button.onclick=()=>$('#harakatReportModal').classList.add('hidden'));$('#checkHarakatCorrectionBtn').onclick=()=>verifyHarakatCorrection($('#harakatCorrectionInput').value);$('#harakatCorrectionInput').onkeydown=event=>{if(event.key==='Enter')verifyHarakatCorrection(event.target.value)};$('#voiceHarakatCorrectionBtn').onclick=voiceHarakatCorrection;$('#settingsBtn').onclick=()=>{$('#settingsModal').classList.remove('hidden');renderSettings()};$('#resetSettingsBtn').onclick=resetRecitationSettings;$('#surahSearch').oninput=e=>renderSurahModal(e.target.value);$('#readerSearch').oninput=e=>renderReaderList(e.target.value);$('#sidebarMushafToggle').onclick=()=>{state.settings.mushafStyle=!state.settings.mushafStyle;$('#sidebarMushafToggle').classList.toggle('active',state.settings.mushafStyle);$('#mushafStyleSwitch').checked=state.settings.mushafStyle;renderTasmee();saveStored();setStatus(state.settings.mushafStyle?'تم تفعيل عرض المصحف: بدون مربعات، أرقام الآيات ظاهرة، الأخطاء بالخط السفلي.':'تم إلغاء عرض المصحف والعودة للعرض الافتراضي.')};$('#sidebarMushafToggle').classList.toggle('active',state.settings.mushafStyle===true);$('#micBtn').onclick=async()=>{if(!state.desiredListening){await startListening();}else{await stopListening();}};$('#revealBtn').onclick=revealCurrent;$('#hardWordsBtn').onclick=openHardWords;$$('[data-close-hard-words]').forEach(b=>b.onclick=()=>$('#hardWordsModal').classList.add('hidden'));$('#hardWordsExportBtn').onclick=exportHardWords;$('#hardWordsCopyBtn').onclick=()=>copyText(hardWordsExportText(),'تم نسخ قائمة الكلمات الصعبة.');$('#resetBtn').onclick=()=>resetSession();$('#recognitionEngineSelect').onchange=async e=>{const v=e.target.value;if(!['smart','fast','quran'].includes(v)){e.target.value=state.settings.recognitionEngine||'smart';return}state.settings.recognitionEngine=v;saveStored();if(v==='smart'){setStatus('جاري الانتقال إلى Zipformer الذكي مع تعطيل تنقية الضوضاء…');if(state.desiredListening)await switchToSmartEngine('اختيار المستخدم للمحرك الذكي')}else if(v==='quran'){setStatus('جارٍ تجهيز محرك Quran Lab…');if(state.desiredListening){await stopListening();await startListening()}}else{setStatus('جاري الانتقال إلى FastConformer المتوافق…');if(state.desiredListening)await switchToFastFallback('اختيار المستخدم للوضع المتوافق',true)}};$('#ignoreSingleLetterSwitch').onchange=e=>{state.settings.ignoreSingleLetter=e.target.checked;saveStored()};$('#detectSingleLetterSwitch').onchange=e=>{state.settings.detectSingleLetter=e.target.checked;saveStored()};$('#autoEngineFallbackSwitch').onchange=e=>{e.target.checked=false;state.settings.autoEngineFallback=false;saveStored()};$('#modelSelect').onchange=async e=>{state.settings.model=e.target.value;saveStored();setStatus('FastConformer غير مستخدم. المحرك الثابت هو Zipformer/Sherpa.');} ;$('#vadRange').oninput=e=>{state.settings.vadThreshold=+e.target.value/100;renderSettings();saveStored()};$('#chunkRange').oninput=e=>{state.settings.chunkSeconds=+e.target.value/10;renderSettings();saveStored()};$('#thresholdRange').oninput=e=>{state.settings.threshold=+e.target.value/100;renderSettings();saveStored()};$('#blurRange').oninput=e=>{state.settings.blur=+e.target.value;renderSettings();renderTasmee();saveStored()};$('#lookaheadSwitch').onchange=e=>{state.settings.lookahead=e.target.checked;saveStored()};$('#autoRewindSwitch').onchange=e=>{state.settings.autoRewind=e.target.checked;ASR.lastAutoRewindSignature='';ASR.lastAutoRewindAt=0;saveStored();diagnostic('تغيير إعادة التلاوة التلقائية داخل الآية',{enabled:e.target.checked})};$('#soundSwitch').onchange=e=>{state.settings.sound=e.target.checked;saveStored()};$('#tajweedSwitch').onchange=e=>{state.settings.tajweedEnabled=e.target.checked;saveStored();updateTajweedSummary();renderTasmee()};$('#tajweedDifficulty').onchange=e=>{state.settings.tajweedDifficulty=e.target.value;saveStored();setStatus('تم تغيير مستوى تدقيق التجويد؛ سيطبق على الكلمات التالية.')};$('#harakatSwitch').onchange=e=>{state.settings.harakatEnabled=e.target.checked;saveStored();updateHarakatSummary();renderTasmee()};$('#windowSwitch').onchange=e=>{state.settings.window=e.target.checked;renderTasmee();saveStored();scheduleTasmeeLayout('window-setting')};$('#mushafStyleSwitch').onchange=e=>{state.settings.mushafStyle=e.target.checked;renderTasmee();saveStored();scheduleTasmeeLayout('mushaf-setting')};
 $('#prevAyah').onclick=()=>{state.lessonAyah=Math.max(0,state.lessonAyah-1);renderLesson()};$('#nextAyah').onclick=()=>{state.lessonAyah=Math.min(currentSurah().ayahs.length-1,state.lessonAyah+1);renderLesson()};$('#listenAyah').onclick=startTestAtAyah;$('#repeatDone').onclick=markLessonDone;$('#goTest').onclick=startTestAtAyah;$('#completeAgain').onclick=()=>{closeModals();resetSession()};$('#clearProgress').onclick=()=>{state.history=[];saveStored();renderProgress();setStatus('تم مسح سجل الجلسات المحفوظ على هذا الجهاز.')};
 window.addEventListener('beforeunload',releasePersistentMic);window.addEventListener('resize',()=>{$('#mobileSurahPick').style.display=innerWidth<=760?'inline-flex':'none'});document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMicTest();closeModals()}});
-const date=new Date();$('#todayLabel').textContent=date.toLocaleDateString('ar-DZ',{weekday:'long',day:'numeric',month:'long'});loadStored();if(!state.settings.recognitionTuned){state.settings.chunkSeconds=Math.max(4.2,Number(state.settings.chunkSeconds)||0);state.settings.recognitionTuned=true;saveStored()}ASR.fullscreenLocked=false;ASR.selectedDeviceId=state.settings.micDeviceId||'';ASR.selectedDeviceLabel=state.settings.micDeviceLabel||'النظام الافتراضي';$('#deviceBadge').textContent=`الميكروفون: ${ASR.selectedDeviceLabel}`;setupLocalASR();tryAutoLoadSiblingData().catch(e=>diagnostic('تعذر الفتح التلقائي لمجلد data',String(e)));if(IS_MOBILE)setSpeechSupport(window.isSecureContext?'وضع الهاتف: سيُستخدم البث المباشر، ويتوفر زر تسجيل مقطع كخيار احتياطي.':'وضع الهاتف غير الآمن: استخدم زر «تسجيل مقطع من الهاتف» لمنح صلاحية التسجيل عبر النظام.');diagnostic('بدء التطبيق',{protocol:location.protocol,userAgent:navigator.userAgent,crossOriginIsolated:self.crossOriginIsolated});renderAll();updateSignalMeter(-90,0);updateErrorReportBadge();updateHarakatSummary();updateTajweedSummary();$('#mobileSurahPick').style.display=innerWidth<=760?'inline-flex':'none';
+const date=new Date();$('#todayLabel').textContent=date.toLocaleDateString('ar-DZ',{weekday:'long',day:'numeric',month:'long'});loadStored();if(!state.settings.recognitionTuned){state.settings.chunkSeconds=Math.max(4.2,Number(state.settings.chunkSeconds)||0);state.settings.recognitionTuned=true;saveStored()}ASR.fullscreenLocked=false;ASR.selectedDeviceId=state.settings.micDeviceId||'';ASR.selectedDeviceLabel=state.settings.micDeviceLabel||'النظام الافتراضي';$('#deviceBadge').textContent=`الميكروفون: ${ASR.selectedDeviceLabel}`;setupLocalASR();autoLoadAtBoot().catch(e=>diagnostic('تعذر الفتح التلقائي لمجلد data',String(e)));if(IS_MOBILE)setSpeechSupport(window.isSecureContext?'وضع الهاتف: سيُستخدم البث المباشر، ويتوفر زر تسجيل مقطع كخيار احتياطي.':'وضع الهاتف غير الآمن: استخدم زر «تسجيل مقطع من الهاتف» لمنح صلاحية التسجيل عبر النظام.');diagnostic('بدء التطبيق',{protocol:location.protocol,userAgent:navigator.userAgent,crossOriginIsolated:self.crossOriginIsolated});renderAll();updateSignalMeter(-90,0);updateErrorReportBadge();updateHarakatSummary();updateTajweedSummary();$('#mobileSurahPick').style.display=innerWidth<=760?'inline-flex':'none';if((state.settings.recognitionEngine||'smart')==='quran')qlabInit();
 
 
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a30de6999a8b6d96',t:'MTc4NzY5NTU1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a326b3229e27589a',t:'MTc4Nzk1NTU4OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a367740c2a24d781',t:'MTc4ODYzNDU3OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a30de6999a8b6d96',t:'MTc4NzY5NTU1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a326b3229e27589a',t:'MTc4Nzk1NTU4OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a367740c2a24d781',t:'MTc4ODYzNDU3OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5b91dc3fa72acfb',t:'MTc5NDg1OTU4Nw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5b91dc3fa72acfb',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
